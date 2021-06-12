@@ -14,5 +14,8 @@ libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-stream" % "2.6.15",
   "io.grpc" % "grpc-core" % "1.38.0",
   "io.grpc" % "grpc-netty-shaded" % "1.38.0",
-  "org.scala-lang" % "scala-library" % "2.13.6"
+  "org.scala-lang" % "scala-library" % "2.13.6",
+  "org.scalatest" %% "scalatest" % "3.3.0-SNAP2" % Test,
+  "com.typesafe.scala-logging" %% "scala-logging" % "3.9.2",
+  "com.typesafe" % "config" % "1.4.1"
 )
