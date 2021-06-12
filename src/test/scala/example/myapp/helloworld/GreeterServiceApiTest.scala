@@ -4,6 +4,7 @@ import akka.actor.ActorSystem
 import akka.grpc.GrpcClientSettings
 import akka.stream.scaladsl.{Sink, Source}
 import example.myapp.example.myapp.helloworld.grpc.{GreeterService, GreeterServiceClient, HelloRequest}
+import example.myapp.helloworld.Utils.{getRandomList, getRandomValue}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
@@ -24,7 +25,7 @@ class GreeterServiceApiTest extends AnyFlatSpec with Matchers with ScalaFutures 
   val client: GreeterService = GreeterServiceClient(clientSettings)
 
   "Greeter Service" should "handle unary requests and response" in {
-    val name = "Test Name"
+    val name = getRandomValue
     val response = client.sayHello(HelloRequest(name)).futureValue
 
     response.getTimestamp should not be null
@@ -32,15 +33,15 @@ class GreeterServiceApiTest extends AnyFlatSpec with Matchers with ScalaFutures 
   }
 
   "Greeter Service" should "handle client streaming" in {
-    val requests = List("Test Name", "Other Test", "Another Test").map(HelloRequest(_))
-    val response = client.itKeepsTalking(Source(requests)).futureValue
+    val data = getRandomList(3)
+    val response = client.itKeepsTalking(Source(data.map(HelloRequest(_)))).futureValue
 
     response.timestamp should not be null
-    response.message should be("Hello, Test Name, Other Test, Another Test")
+    response.message should be(s"Hello, ${data.mkString(", ")}")
   }
 
   "Greeter Service" should "handle server streaming" in {
-    val name = "Test Name"
+    val name = getRandomValue
     val responses = client.itKeepsReplying(HelloRequest(name)).runWith(Sink.seq).futureValue
 
     responses should not be empty
@@ -49,8 +50,8 @@ class GreeterServiceApiTest extends AnyFlatSpec with Matchers with ScalaFutures 
   }
 
   "Greeter Service" should "handle bi-directional streaming" in {
-    val requests = List("Test Name", "Other Test", "Another Test").map(HelloRequest(_))
-    val responses = client.streamHellos(Source(requests)).runWith(Sink.seq).futureValue
+    val data = getRandomList(3)
+    val responses = client.streamHellos(Source(data.map(HelloRequest(_)))).runWith(Sink.seq).futureValue
 
     responses should not be empty
     val messages = responses.map(_.message).toList
